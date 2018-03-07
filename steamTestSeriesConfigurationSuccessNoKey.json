@@ -1,0 +1,145 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environments_steamTestSeries_name": {
+      "defaultValue": "steamTestSeries",
+      "type": "string"
+    },
+    "eventsources_eventTestStream_name": {
+      "defaultValue": "eventTestStream",
+      "type": "string"
+    },
+    "IotHubs_steamlane_name": {
+      "defaultValue": "steamlane",
+      "type": "string"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "comments": "Generalized from resource: '/subscriptions/8ce996ca-a5c0-4dd3-bb6d-b60e7c0c2033/resourceGroups/steam/providers/Microsoft.Devices/IotHubs/steamlane'.",
+      "type": "Microsoft.Devices/IotHubs",
+      "sku": {
+        "name": "F1",
+        "tier": "Free",
+        "capacity": 1
+      },
+      "name": "[parameters('IotHubs_steamlane_name')]",
+      "apiVersion": "2016-02-03",
+      "location": "westus",
+      "tags": {},
+      "scale": null,
+      "properties": {
+        "operationsMonitoringProperties": {
+          "events": {
+            "None": "None",
+            "Connections": "None",
+            "DeviceTelemetry": "None",
+            "C2DCommands": "None",
+            "DeviceIdentityOperations": "None",
+            "FileUploadOperations": "None",
+            "Routes": "None"
+          }
+        },
+        "ipFilterRules": [],
+        "eventHubEndpoints": {
+          "events": {
+            "retentionTimeInDays": 1,
+            "partitionCount": 2,
+            "partitionIds": [
+              "0",
+              "1"
+            ],
+            "path": "[concat('iothub-ehub-', parameters('IotHubs_steamlane_name'),'-351496-ab7115de51')]",
+            "endpoint": "sb://ihsuprodbyres040dednamespace.servicebus.windows.net/"
+          },
+          "operationsMonitoringEvents": {
+            "retentionTimeInDays": 1,
+            "partitionCount": 2,
+            "partitionIds": [
+              "0",
+              "1"
+            ],
+            "path": "[concat('iothub-ehub-', parameters('IotHubs_steamlane_name'),'-351496-0f7dfe6975')]",
+            "endpoint": "sb://ihsuprodbyres039dednamespace.servicebus.windows.net/"
+          }
+        },
+        "routing": {
+          "endpoints": {
+            "serviceBusQueues": [],
+            "serviceBusTopics": [],
+            "eventHubs": []
+          },
+          "routes": [],
+          "fallbackRoute": {
+            "name": "$fallback",
+            "source": "DeviceMessages",
+            "condition": "true",
+            "endpointNames": [
+              "events"
+            ],
+            "isEnabled": true
+          }
+        },
+        "storageEndpoints": {
+          "$default": {
+            "sasTtlAsIso8601": "PT1H",
+            "connectionString": "",
+            "containerName": ""
+          }
+        },
+        "enableFileUploadNotifications": false,
+        "cloudToDevice": {
+          "maxDeliveryCount": 10,
+          "defaultTtlAsIso8601": "PT1H",
+          "feedback": {
+            "lockDurationAsIso8601": "PT1M",
+            "ttlAsIso8601": "PT1H",
+            "maxDeliveryCount": 10
+          }
+        },
+        "features": "None"
+      },
+      "dependsOn": []
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/8ce996ca-a5c0-4dd3-bb6d-b60e7c0c2033/resourcegroups/steam/providers/Microsoft.TimeSeriesInsights/environments/steamTestSeries'.",
+      "type": "Microsoft.TimeSeriesInsights/environments",
+      "sku": {
+        "name": "S1",
+        "capacity": 1
+      },
+      "name": "[parameters('environments_steamTestSeries_name')]",
+      "apiVersion": "2017-11-15",
+      "location": "westus",
+      "scale": null,
+      "properties": {
+        "dataRetentionTime": "P31D",
+        "storageLimitExceededBehavior": "PurgeOldData"
+      },
+      "dependsOn": []
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/8ce996ca-a5c0-4dd3-bb6d-b60e7c0c2033/resourcegroups/steam/providers/Microsoft.TimeSeriesInsights/environments/steamTestSeries/eventsources/eventTestStream'.",
+      "type": "Microsoft.TimeSeriesInsights/environments/eventsources",
+      "kind": "Microsoft.IoTHub",
+      "name": "[concat(parameters('environments_steamTestSeries_name'), '/', parameters('eventsources_eventTestStream_name'))]",
+      "apiVersion": "2017-11-15",
+      "location": "westus",
+      "scale": null,
+      "properties": {
+        "iotHubName": "steamlane",
+        "keyName": "iothubowner",
+        "consumerGroupName": "testdatagroup",
+        "sharedAccessKey": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        "eventSourceResourceId": "[resourceId('Microsoft.Devices/IotHubs', parameters('IotHubs_steamlane_name'))]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.TimeSeriesInsights/environments', parameters('environments_steamTestSeries_name'))]",
+        "[resourceId('Microsoft.Devices/IotHubs', parameters('IotHubs_steamlane_name'))]"
+      ]
+    }
+  ],
+  "outputs": {}
+}
